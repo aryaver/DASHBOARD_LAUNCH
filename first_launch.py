@@ -12,7 +12,7 @@ from email.mime.multipart import MIMEMultipart
 
 app = dash.Dash(external_stylesheets=[dbc.themes.LUMEN])#, suppress_callback_exceptions=True)
 
-server = app.server
+#server = app.server
 
 # Define the layout of the app
 app.layout = html.Div(children = 

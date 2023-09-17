@@ -98,7 +98,7 @@ app.layout = html.Div(children =
     #           dbc.Button('Send Mail', id = 'send_info_mail', n_clicks = 0, color="warning", className = 'text-center')],
     #          style = {'display':'flex'}),#, 'margin': '15px'}),
     
-    html.Div(id='current-month-bday-anni-info', className = 'text-wrap'), #to send bday anni info
+    html.Div(id='current-month-bday-anni-info'), #to send bday anni info
  
 ],style={
         'background': 'linear-gradient(360deg, #FF5733, #FFC300)',  
@@ -154,18 +154,30 @@ def send_email(sender_email, password, recv_email, subject, message):
 
         msg.attach(MIMEText(message, 'plain'))
 
-        server1 = smtplib.SMTP("smtp.gmail.com", 587)#("smtp.clevered.com", 587) #
+        server1 = smtplib.SMTP("smtp.gmail.com", 587)
         server1.starttls()
-        server1.login(sender_email, password)
-        print("login successful")
+        login_result = server1.login(sender_email, password)
+        #print("login successful")
 
-        server1.sendmail(sender_email, recv_email, msg.as_string())
-        server1.quit()
-
-        return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
+        if login_result[0] == 235:  # Check if login was successful -> 235 is the code for successful login
+            server1.sendmail(sender_email, recv_email, msg.as_string())
+            server1.quit()
+            return 'Email sent successfully!'
+        else:
+            return 'Error: Incorrect password or authentication failed.'
+        
+    except smtplib.SMTPException as e:
+        return f"Error: Unable to send email - {str(e)}"
     except Exception as e:
-        return f"Error: Unable to send email! - {str(e)}"
+        return f"Error: An unexpected error occurred - {str(e)}"
+        
+        # server1.sendmail(sender_email, recv_email, msg.as_string())
+        # server1.quit()
+    #     return "Email sent successfully!"
+    # except Exception as e:
+    #     return f"Error: Unable to send email! - {str(e)}"
     
+#Function with email body
 def email_body(bdays_today, annis_today):   
     body = ''  
     if bdays_today is not None and not bdays_today.empty:   
@@ -182,42 +194,6 @@ def email_body(bdays_today, annis_today):
             today_email_a = row['email ID']
             body += f"- {today_name_a} : {today_email_a}\n"
     return body
-
-@app.callback(
-    Output('current-month-bday-anni-info', 'children'), 
-    Input('upload-data', 'contents'),
-    Input('send_info_mail', 'n_clicks'),
-    State('sender_password_input', 'value'),
-    State('upload-data', 'filename')
-)
-def send_bday_anni_info(contents, n_clicks, password, filename):
-    if n_clicks > 0 and contents is not None:
-
-        df = read_file(contents, filename)
-        
-        sender_email = 'samreen@clevered.com' #'arya.verma.923@gmail.com'#
-        recipient_email = 'nidhi@clevered.com'#   'arya.verma2021@vitstudent.ac.in' #    
-
-        current_month = get_current_month()
-        current_date = get_current_date()
-        birth_month_filter = (df['date of birth'].dt.strftime('%m') == current_month) & (df['date of birth'].dt.strftime('%d') == current_date)
-        bdays_today = df[birth_month_filter][['name', 'email ID']] 
-
-        anni_month_filter = (df['date of joining'].dt.strftime('%m') == current_month) & (df['date of joining'].dt.strftime('%d') == current_date)
-        annis_today = df[anni_month_filter][['name', 'email ID']] 
-
-        message = email_body(bdays_today, annis_today)
-        send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)
-
-        #return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
-    # try:
-    #     send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)
-    #     return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
-    # except Exception as e:
-    #     return f'Email could not be sent: {str(e)}'
-    else:
-        return '' 
-        
 
 #Define callback to display persons with DOB or DOJ in the current month
 @app.callback(
@@ -379,6 +355,51 @@ def update_person_info(contents, filename, selected_name, selected_month, search
     if clear_clicks is not None and clear_clicks >0:
             manual_search_name = ''
     return output_person_info, name_dropdown_options, manual_search_name
+
+@app.callback(
+    Output('current-month-bday-anni-info', 'children'), 
+    Input('upload-data', 'contents'),
+    Input('send_info_mail', 'n_clicks'),
+    State('sender_password_input', 'value'),
+    State('upload-data', 'filename')
+)
+def send_bday_anni_info(contents, n_clicks, password, filename):
+    if n_clicks > 0 and contents is not None and password is not None:
+
+        df = read_file(contents, filename)
+        
+        sender_email = 'arya.verma.923@gmail.com' #'arya.verma.923@gmail.com'#
+        recipient_email = 'arya.verma.923@gmail.com' #'samreen@clevered.com'#'nidhi@clevered.com'#    
+
+        current_month = get_current_month()
+        current_date = get_current_date()
+        birth_month_filter = (df['date of birth'].dt.strftime('%m') == current_month) & (df['date of birth'].dt.strftime('%d') == current_date)
+        bdays_today = df[birth_month_filter][['name', 'email ID']] 
+
+        anni_month_filter = (df['date of joining'].dt.strftime('%m') == current_month) & (df['date of joining'].dt.strftime('%d') == current_date)
+        annis_today = df[anni_month_filter][['name', 'email ID']] 
+
+        message = email_body(bdays_today, annis_today)
+        # if len(bdays_today) > 0 or len(annis_today) > 0:
+        #     send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)            
+        # else:
+        #     return dbc.Alert('No emails to send.', color = 'danger', style = {'width':'30vw'})  
+        
+        # alert = dbc.Alert('Email sent successfully!', color = 'success', style = {'width':'30vw'})
+        
+
+        if len(bdays_today) > 0 or len(annis_today) > 0:
+            send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)   
+            if send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message) == 'Email sent successfully!':
+                return dbc.Alert('Email sent successfully!', color = 'success', style = {'width':'30vw'}) 
+            else:
+                return dbc.Alert('Error: Incorrect password or authentication failed.', color = 'danger', style = {'width':'30vw'}) 
+        else:
+            return dbc.Alert('No emails to send.', color = 'danger', style = {'width':'30vw'})   
+    
+    else:
+        return ''
+
 
 # Run the app
 if __name__ == '__main__':

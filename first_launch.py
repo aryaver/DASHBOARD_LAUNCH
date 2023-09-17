@@ -162,7 +162,7 @@ def send_email(sender_email, password, recv_email, subject, message):
         server1.sendmail(sender_email, recv_email, msg.as_string())
         server1.quit()
 
-        return "Email sent successfully"
+        return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
     except Exception as e:
         return f"Error: Unable to send email! - {str(e)}"
     
@@ -195,8 +195,8 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
 
         df = read_file(contents, filename)
         
-        sender_email = 'arya.verma.923@gmail.com'#'samreen@clevered.com' #
-        recipient_email = 'samreen@clevered.com'#   'arya.verma2021@vitstudent.ac.in' #    
+        sender_email = 'samreen@clevered.com' #'arya.verma.923@gmail.com'#
+        recipient_email = 'nidhi@clevered.com'#   'arya.verma2021@vitstudent.ac.in' #    
 
         current_month = get_current_month()
         current_date = get_current_date()
@@ -207,14 +207,16 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
         annis_today = df[anni_month_filter][['name', 'email ID']] 
 
         message = email_body(bdays_today, annis_today)
+        send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)
 
-        try:
-            send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)
-            return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
-        except Exception as e:
-            return f'Email could not be sent: {str(e)}'
+        #return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
+    # try:
+    #     send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)
+    #     return dbc.Alert("Email sent successfully!", color = 'success', className = 'opacity-75')
+    # except Exception as e:
+    #     return f'Email could not be sent: {str(e)}'
     else:
-        return ''  # Initial state
+        return '' 
         
 
 #Define callback to display persons with DOB or DOJ in the current month

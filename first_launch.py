@@ -368,8 +368,8 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
 
         df = read_file(contents, filename)
         
-        sender_email = 'arya.verma.923@gmail.com'#'samreen@clevered.com'
-        recipient_email = 'samreen@clevered.com'#'nidhi@clevered.com' 
+        sender_email = 'samreen@clevered.com'#'sampleid987@gmail.com'#
+        recipient_email = 'nidhi@clevered.com' #'samreen@clevered.com'
 
         current_month = get_current_month()
         current_date = get_current_date()

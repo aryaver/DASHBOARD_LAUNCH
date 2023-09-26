@@ -19,13 +19,13 @@ app.layout = html.Div(children =
 [
     #html.Div([dbc.Label("Clevered Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'})]),
     html.H1("Clevered Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
-
+                                                                        
     html.A(dbc.Button('Refresh', color="warning"),href='/', className="d-md-flex justify-content-md-end"),
 
     html.Div(id='upload-container', className='centered-container', children=[
             dcc.Upload(
                 id='upload-data',
-                children=html.Div(['Drag and Drop or ', html.A('Select .csv / .xlsx File')], style={'color': 'black'}),
+                children=html.Div([html.A('Select .csv / .xlsx File')], style={'color': 'black'}),
                 style={
                     'width': '50%',
                     'height': '60px',
@@ -131,15 +131,22 @@ def read_file(contents, filename):
 
     elif file_extension == 'xlsx':
         decoded = io.BytesIO(base64.b64decode(content_string))
-        df = pd.read_excel(decoded, engine='openpyxl')
-
+        # df = pd.read_excel(decoded, engine='openpyxl')
+        combined_df = pd.read_excel(decoded, engine='openpyxl', sheet_name =None)
+        df = pd.concat(combined_df.values(), ignore_index=True) # Concatenate all sheets into a single df ignore_index = True makes the index continuous
+        # print(df)
     else:
         raise ValueError(f"Unsupported File Format: {file_extension}")
 
     
     df['date of birth'] = pd.to_datetime(df['date of birth'])
     df['date of joining'] = pd.to_datetime(df['date of joining'])
+    # print("--------------------------------------------------------print all heads---------------------------------------------------------------")
+    # print(df.head())
+    
 
+    # print("----------------------------------------------------print all datatypes-------------------------------------------------------------")
+    # print(df.dtypes)
     return df                         
 
 # Function to send an email
@@ -207,7 +214,8 @@ def display_current_month_info(contents, filename):
         return ''
 
     df = read_file(contents, filename)
-    
+    #print(df.columns)
+
     current_month = get_current_month()
     birth_month_filter = df['date of birth'].dt.strftime('%m') == current_month  
     joining_month_filter = df['date of joining'].dt.strftime('%m') == current_month
@@ -312,9 +320,13 @@ def update_person_info(contents, filename, selected_name, selected_month, search
         filtered_persons = df[birth_month_filter | joining_month_filter]
 
         person_info_divs = []
+        # print("-----------------------------------------------------if name in df, print all names--------------------------------------------------")
+        # if 'name' in df:
+        #     print(df['name'])
 
         for _, row in filtered_persons.iterrows():
             person_name = row['name']
+            #print(person_name)
             person_info_div = html.Div([
                 html.H4(f'Details for {person_name}:')
             ])

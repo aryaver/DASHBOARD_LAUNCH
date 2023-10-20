@@ -17,8 +17,7 @@ server = app.server
 # Define the layout of the app
 app.layout = html.Div(children = 
 [
-    #html.Div([dbc.Label("Clevered Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'})]),
-    html.H1("Clevered Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
+   html.H1("Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
                                                                         
     html.A(dbc.Button('Refresh', color="warning"),href='/', className="d-md-flex justify-content-md-end"),
 
@@ -40,28 +39,26 @@ app.layout = html.Div(children =
             ),
         ]),
     
-    html.Div([dbc.Select(id='month-dropdown',options=[
-                {'label': 'January', 'value': '01'},
-                {'label': 'February', 'value': '02'},
-                {'label': 'March', 'value': '03'},
-                {'label': 'April', 'value': '04'},
-                {'label': 'May', 'value': '05'},
-                {'label': 'June', 'value': '06'},
-                {'label': 'July', 'value': '07'},
-                {'label': 'August', 'value': '08'},
-                {'label': 'September', 'value': '09'},
-                {'label': 'October', 'value': '10'},
-                {'label': 'November', 'value': '11'},
-                {'label': 'December', 'value': '12'},
-            ],
-            placeholder='Select a month...',
-            style={'width': '90%', 'margin': '15px'},
-            className="px-2 border"# bg-white rounded-pill"
-        ),
+    html.Div([  dbc.Select( id='month-dropdown',options=[{'label': 'January', 'value': '01'},
+                                                         {'label': 'February', 'value': '02'},
+                                                         {'label': 'March', 'value': '03'},
+                                                         {'label': 'April', 'value': '04'},
+                                                         {'label': 'May', 'value': '05'},
+                                                         {'label': 'June', 'value': '06'},
+                                                         {'label': 'July', 'value': '07'},
+                                                         {'label': 'August', 'value': '08'},
+                                                         {'label': 'September', 'value': '09'},
+                                                         {'label': 'October', 'value': '10'},
+                                                         {'label': 'November', 'value': '11'},
+                                                         {'label': 'December', 'value': '12'},],
+                            placeholder='Select a month...',
+                            style={'width': '90%', 'margin': '15px'},
+                            className="px-2 border"# bg-white rounded-pill"
+                        ),
         
-        dbc.Select(id='name-dropdown',placeholder='Select a person...',style={'width': '90%', 'margin': '15px'},
-            className="px-2 bg-white border"# rounded-pill"
-        ),
+                dbc.Select(id='name-dropdown',placeholder='Select a person...',style={'width': '90%', 'margin': '15px'},
+                            className="px-2 bg-white border"# rounded-pill"
+                        ),
     ], style={'display': 'flex'}), 
 
     html.Div([html.Div([dbc.Input(id='manual-search-input', type='text', placeholder='Enter a name to get details...', style={'width': '33vw'}), #30% of viewport width
@@ -73,31 +70,12 @@ app.layout = html.Div(children =
                         style = {'display':'flex'}),#, 'margin': '15px'}),
              ],style = {'display':'flex', 'margin': '15px'}),
              
-    # html.Div([dbc.Input(id='manual-search-input', type='text', placeholder='Enter a name to get details...', style={'width': '30vw' }), #30% of viewport width
-    #                      dbc.ButtonGroup([dbc.Button('Search', id='manual-search-button', n_clicks=0, className = "text-center", color = "success"),
-    #                                       dbc.Button('Clear', id = 'clear-button', n_clicks = 0, className = "text-center", color = "danger")])],
-    #                      style = {'display':'flex'}),
-
     html.Div(id='output-columns'),
     
     html.Div(id='output-person-info', style={'color': 'black'}),
     
     html.Div(id='current-month-info', style={'color': 'black'}),#, className = 'text-dark'),  
 
-    # html.Div([
-    #     html.H2("Current Month Analysis", className="text-center fw-bold"),# fst-italic text-decoration-line-through"),
-
-    #     html.Div([html.P('Birthdays in this month', className = "fst-italic fw-bold", style={'width': '50%', 'margin': 'auto', 'text-align': 'center', 'font-size': '20px'}),
-    #               html.P('Anniversaries in this month', className = "fst-italic fw-bold", style={'width': '50%', 'margin': 'auto', 'text-align': 'center', 'font-size': '20px'})], 
-    #               style={'display': 'flex', 'justify-content': 'center'}),
-        
-    #     html.Div(id='current-month-info', className = 'text-dark')  
-    # ]),
-  
-    # html.Div([dbc.Input(id='sender_password_input', type='password', placeholder='Enter your password...', style={'width': '30vw'}), 
-    #           dbc.Button('Send Mail', id = 'send_info_mail', n_clicks = 0, color="warning", className = 'text-center')],
-    #          style = {'display':'flex'}),#, 'margin': '15px'}),
-    
     html.Div(id='current-month-bday-anni-info'), #to send bday anni info
  
 ],style={
@@ -131,9 +109,8 @@ def read_file(contents, filename):
 
     elif file_extension == 'xlsx':
         decoded = io.BytesIO(base64.b64decode(content_string))
-        # df = pd.read_excel(decoded, engine='openpyxl')
         combined_df = pd.read_excel(decoded, engine='openpyxl', sheet_name =None)
-        df = pd.concat(combined_df.values(), ignore_index=True) # Concatenate all sheets into a single df ignore_index = True makes the index continuous
+        df = pd.concat(combined_df.values(), ignore_index=True) # Concatenate all sheets into a single df ignore_index = True se index continuous hoga
         # print(df)
     else:
         raise ValueError(f"Unsupported File Format: {file_extension}")
@@ -153,7 +130,6 @@ def read_file(contents, filename):
 def send_email(sender_email, password, recv_email, subject, message):
 
     try:
-        # Creating a message
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = recv_email
@@ -177,13 +153,8 @@ def send_email(sender_email, password, recv_email, subject, message):
         return f"Error: Unable to send email - {str(e)}"
     except Exception as e:
         return f"Error: An unexpected error occurred - {str(e)}"
-        
-        # server1.sendmail(sender_email, recv_email, msg.as_string())
-        # server1.quit()
-    #     return "Email sent successfully!"
-    # except Exception as e:
-    #     return f"Error: Unable to send email! - {str(e)}"
-    
+
+
 #Function with email body
 def email_body(bdays_today, annis_today):   
     body = ''  
@@ -202,7 +173,7 @@ def email_body(bdays_today, annis_today):
             body += f"- {today_name_a} : {today_email_a}\n"
     return body
 
-#Define callback to display persons with DOB or DOJ in the current month
+#callback to display persons with DOB or DOJ in the current month
 @app.callback(
     Output('current-month-info', 'children'), 
     Input('upload-data', 'contents'),
@@ -224,7 +195,6 @@ def display_current_month_info(contents, filename):
     birth_persons = df[birth_month_filter]
     joining_persons = df[joining_month_filter]
 
-    # Create Bootstrap columns for DOB and DOJ
     birth_person_info_divs = []
     joining_person_info_divs = []
 
@@ -257,11 +227,7 @@ def display_current_month_info(contents, filename):
 
 
         joining_person_info_divs.append(person_info_div)
-    
-    # current_month_info_div = html.Div([
-    #     html.Div(birth_person_info_divs, className='col-md-6'),
-    #     html.Div(joining_person_info_divs, className='col-md-6')
-    # ], className='row')
+
     current_month_info_div = html.Div([
         html.H2("Current Month Analysis", className="text-center fw-bold"),# fst-italic text-decoration-line-through"),
 
@@ -275,18 +241,10 @@ def display_current_month_info(contents, filename):
                     ]
                 ),
             ])])
-    #     html.Div([
-    #         html.Div([html.H4('Birthdays in this month', className = "fst-italic fw-bold"),#, style={'width': '50%', 'margin': 'auto', 'text-align': 'center', 'font-size': '20px'}), 
-    #                   html.P(birth_person_info_divs)]), #, className='col-md-6')]),
-    #         html.Div([html.H4('Work Anniversaries in this month', className = "fst-italic fw-bold"),#, style={'width': '50%', 'margin': 'auto', 'text-align': 'center', 'font-size': '20px'}), 
-    #                   html.P(joining_person_info_divs)])], #, className='col-md-6')])], 
-    #         style={'display': 'flex'})#, 'justify-content': 'center'})
-    # ])
-
-    
+ 
     return current_month_info_div
 
-# Define combined callback to handle person info display, name dropdown updates, and manual search
+#combined callback to handle person info display, name dropdown updates, and manual search
 @app.callback(
     [
         Output('output-person-info', 'children'),
@@ -349,8 +307,8 @@ def update_person_info(contents, filename, selected_name, selected_month, search
         manual_search_name_first = manual_search_name_components[0].lower()
         df['name_lower'] = df['name'].str.lower()
 
-        person_info = df[df['name_lower'].str.startswith(manual_search_name_first)].copy() ## to create a copy of the original dataframe
-        person_info.drop('name_lower', axis = 1, inplace = True) #inplace true for dropping col from the same data frame and not making a copy of the dataframe with a col dropped. axis = 1 to delete col and not row(axis=0)
+        person_info = df[df['name_lower'].str.startswith(manual_search_name_first)].copy() ##create a copy of the original df
+        person_info.drop('name_lower', axis = 1, inplace = True) #inplace true for dropping col from the same df and not making a copy of the dataframe with a col dropped. axis = 1 to delete col and not row(axis=0)
         
     if not person_info.empty:
             person_info_dict = person_info.iloc[0].to_dict()
@@ -358,7 +316,6 @@ def update_person_info(contents, filename, selected_name, selected_month, search
                 html.H4(f'Details for {manual_search_name}:')
             ])
 
-            # Iterate over all columns in the row and add them to the div
             for column_name, value in person_info_dict.items():
                 output_person_info.children.append(html.P(f'{column_name}: {value}'))
 
@@ -380,8 +337,8 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
 
         df = read_file(contents, filename)
         
-        sender_email = 'samreen@clevered.com'#'sampleid987@gmail.com'#
-        recipient_email = 'nidhi@clevered.com' #'samreen@clevered.com'
+        sender_email = 'sampleid987@gmail.com'
+        recipient_email = 'sampleid987@gmail.com'
 
         current_month = get_current_month()
         current_date = get_current_date()
@@ -392,12 +349,7 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
         annis_today = df[anni_month_filter][['name', 'email ID']] 
 
         message = email_body(bdays_today, annis_today)
-        # if len(bdays_today) > 0 or len(annis_today) > 0:
-        #     send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)            
-        # else:
-        #     return dbc.Alert('No emails to send.', color = 'danger', style = {'width':'30vw'})  
-        
-
+     
         if len(bdays_today) > 0 or len(annis_today) > 0:
             send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message)   
             if send_email(sender_email, password, recipient_email, "Birthdays and Work Anniversaries today.", message) == 1:
@@ -411,6 +363,5 @@ def send_bday_anni_info(contents, n_clicks, password, filename):
         return ''
 
 
-# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True, port=8067)

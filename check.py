@@ -17,24 +17,8 @@ server = app.server
 # Define the layout of the app
 app.layout = html.Div(children = 
 [
-    html.H1("Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
-
-    html.Div([
-        dbc.Label("Select Dept."),
-        dbc.RadioItems(
-            options=[
-                {"label": "Sales", "value": 0},
-                {"label": "Marketing", "value": 1},
-                {"label": "Support", "value": 2},
-                {"label": "Freelancers", "value": 3},
-                {"label": "Internship", "value": 4},
-            ],
-            value=0,
-            id="radioitems-input",
-        ),
-    ]
-),        
-    html.Div(id="output-div"),                                                           
+   html.H1("Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
+                                                                        
     html.A(dbc.Button('Refresh', color="warning"),href='/', className="d-md-flex justify-content-md-end"),
 
     html.Div(id='upload-container', className='centered-container', children=[
@@ -112,15 +96,21 @@ def get_current_date():
     now = datetime.datetime.now()
     return now.strftime('%d')
 
-def read_file(contents, filename, Sheet):
+def read_file(contents, filename):
     if contents is None:
         return ''
     content_type, content_string = contents.split(',')
     file_extension = filename.split('.')[-1].lower()
 
-    if file_extension == 'xlsx':
+    #print(file_extension)
+    if file_extension == 'csv':
+        decoded = io.StringIO(base64.b64decode(content_string).decode('utf-8'))
+        df = pd.read_csv(decoded, encoding = 'utf-8')
+
+    elif file_extension == 'xlsx':
         decoded = io.BytesIO(base64.b64decode(content_string))
-        df = pd.read_excel(decoded, engine='openpyxl', sheet_name =Sheet)
+        combined_df = pd.read_excel(decoded, engine='openpyxl', sheet_name =None)
+        df = pd.concat(combined_df.values(), ignore_index=True) # Concatenate all sheets into a single df ignore_index = True se index continuous hoga
         # print(df)
     else:
         raise ValueError(f"Unsupported File Format: {file_extension}")
@@ -183,20 +173,18 @@ def email_body(bdays_today, annis_today):
             body += f"- {today_name_a} : {today_email_a}\n"
     return body
 
-
 #callback to display persons with DOB or DOJ in the current month
 @app.callback(
     Output('current-month-info', 'children'), 
     Input('upload-data', 'contents'),
-    Input('radioitems-input', 'value'),
     State('upload-data', 'filename')
 ) 
    
-def display_current_month_info(contents, dept,  filename):
+def display_current_month_info(contents, filename):
     if contents is None:
         return ''
 
-    df = read_file(contents, filename, dept)
+    df = read_file(contents, filename)
     #print(df.columns)
 
     current_month = get_current_month()
@@ -265,8 +253,7 @@ def display_current_month_info(contents, dept,  filename):
     ],
     [
         Input('upload-data', 'contents'),
-        State('upload-data', 'filename'),  
-        Input('radioitems-input', 'value'),      
+        State('upload-data', 'filename'),        
         Input('name-dropdown', 'value'),
         Input('month-dropdown', 'value'),
         Input('manual-search-button', 'n_clicks'),
@@ -274,11 +261,11 @@ def display_current_month_info(contents, dept,  filename):
         State('manual-search-input', 'value'),
     ]
 )
-def update_person_info(contents, filename, dept, selected_name, selected_month, search_clicks, clear_clicks, manual_search_name):
+def update_person_info(contents, filename, selected_name, selected_month, search_clicks, clear_clicks, manual_search_name):
     if contents is None:
         return '', [], manual_search_name
 
-    df = read_file(contents, filename, dept)
+    df = read_file(contents, filename)
     
     output_person_info = ''
     name_dropdown_options = []
@@ -341,15 +328,14 @@ def update_person_info(contents, filename, dept, selected_name, selected_month, 
 @app.callback(
     Output('current-month-bday-anni-info', 'children'), 
     Input('upload-data', 'contents'),
-    Input('radioitems-input', 'value'),
     Input('send_info_mail', 'n_clicks'),
     State('sender_password_input', 'value'),
     State('upload-data', 'filename')
 )
-def send_bday_anni_info(contents, dept, n_clicks, password, filename):
+def send_bday_anni_info(contents, n_clicks, password, filename):
     if n_clicks > 0 and contents is not None and password is not None:
 
-        df = read_file(contents, filename, dept)
+        df = read_file(contents, filename)
         
         sender_email = 'sampleid987@gmail.com'
         recipient_email = 'sampleid987@gmail.com'

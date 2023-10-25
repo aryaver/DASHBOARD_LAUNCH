@@ -17,30 +17,38 @@ server = app.server
 # Define the layout of the app
 app.layout = html.Div(children = 
 [
-    html.H1("Dashboard", className="text-center fw-bold text-decoration-underline", style={'color': 'black'}),
-
+    dbc.Row([
+        dbc.Col([]),
+        dbc.Col([html.H1("Clevered HR Dashboard", className="fw-bold text-decoration-underline", style={'color': 'black'})]),
+        dbc.Col([html.A(dbc.Button('Refresh', color="warning"),href='/', className="d-md-flex justify-content-md-end", style={"text-decoration": "none"})])
+    
+    ]),
+    html.Br(),
     html.Div([
-        dbc.Label("Select Dept."),
+        dbc.Label("Select Department", className = "text-black fw-bold"),
         dbc.RadioItems(
             options=[
                 {"label": "Sales", "value": 0},
                 {"label": "Marketing", "value": 1},
                 {"label": "Support", "value": 2},
-                {"label": "Freelancers", "value": 3},
-                {"label": "Internship", "value": 4},
+                {"label": "Partnership", "value": 3},
+                {"label": "Trainers", "value": 4},
+                {"label": "IT", "value": 5},
+                {"label": "Freelancers", "value": 6},
+                {"label": "Internship", "value": 7},
             ],
             value=0,
             id="radioitems-input",
+            inline = True,
+            className = "text-black"
         ),
     ]
 ),        
-    html.Div(id="output-div"),                                                           
-    html.A(dbc.Button('Refresh', color="warning"),href='/', className="d-md-flex justify-content-md-end"),
-
+    html.Br(),                                                     
     html.Div(id='upload-container', className='centered-container', children=[
             dcc.Upload(
                 id='upload-data',
-                children=html.Div([html.A('Select .csv / .xlsx File')], style={'color': 'black'}),
+                children=html.Div([html.A('Select .xlsx File')], style={'color': 'black'}),
                 style={
                     'width': '50%',
                     'height': '60px',
@@ -54,7 +62,7 @@ app.layout = html.Div(children =
                 multiple=False,
             ),
         ]),
-    
+    html.Br(),
     html.Div([  dbc.Select( id='month-dropdown',options=[{'label': 'January', 'value': '01'},
                                                          {'label': 'February', 'value': '02'},
                                                          {'label': 'March', 'value': '03'},
@@ -77,14 +85,23 @@ app.layout = html.Div(children =
                         ),
     ], style={'display': 'flex'}), 
 
-    html.Div([html.Div([dbc.Input(id='manual-search-input', type='text', placeholder='Enter a name to get details...', style={'width': '33vw'}), #30% of viewport width
-                         dbc.ButtonGroup([dbc.Button('Search', id='manual-search-button', n_clicks=0, className = "text-center", color = "success"),
-                                          dbc.Button('Clear', id = 'clear-button', n_clicks = 0, className = "text-center", color = "danger")], style = {'margin-right': '30px'})],
-                         style = {'display':'flex'}),
-              html.Div([dbc.Input(id='sender_password_input', type='password', placeholder='Enter your password...', style={'width': '36vw'}), 
-                        dbc.Button('Send Mail', id = 'send_info_mail', n_clicks = 0, color="warning", className = 'text-center')],
-                        style = {'display':'flex'}),#, 'margin': '15px'}),
-             ],style = {'display':'flex', 'margin': '15px'}),
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                dbc.Input(id='manual-search-input', type='text', placeholder='Enter a name to get details...'),
+                dbc.ButtonGroup([
+                    dbc.Button('Search', id='manual-search-button', n_clicks=0, className = "text-center", color = "success"),
+                    dbc.Button('Clear', id = 'clear-button', n_clicks = 0, className = "text-center", color = "danger")])],
+                    style = {'display':'flex'}),
+            ]),
+        dbc.Col([
+            html.Div([
+                dbc.Input(id='sender_password_input', type='password', placeholder='Enter your password...'), 
+                dbc.Button('Send Mail', id = 'send_info_mail', n_clicks = 0, color="warning", className = 'text-center', style={'width': '150px'})],
+                style = {'display':'flex'}),#, 'margin': '15px'}),     
+            ])
+        ]),
              
     html.Div(id='output-columns'),
     
